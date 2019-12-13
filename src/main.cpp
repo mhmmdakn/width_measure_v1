@@ -119,6 +119,7 @@ String dataTypeGet(String path)
 {
   String dataType = "text/plain";
 
+
   if (path.endsWith(".src"))
     path = path.substring(0, path.lastIndexOf("."));
   else if (path.endsWith(".htm"))
