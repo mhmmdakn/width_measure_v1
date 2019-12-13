@@ -29,13 +29,22 @@
 #define TIME_OUT_ERROR 5
 ////////////////////////////////////
 
-///////Register Start Address///////
-#define WIFI_BEGIN 500
-#define WIFI_CONFIG 1000
-#define DEVICE_CONFIG 1500
-#define DEVICE_REGISTER 2000
-#define ERROR_REGISTER 2500
 
+
+
+///////Register Start Address///////
+#define WIFI_BEGIN 100
+#define WIFI_CONFIG 200
+#define DEVICE_CONFIG 300
+#define DEVICE_REGISTER 400
+#define ERROR_REGISTER 500
+////////////////////////////////////
+
+///////Register END Address///////
+#define WIFI_BEGIN_END 199
+#define WIFI_CONFIG_END 299
+#define DEVICE_CONFIG_END 399
+#define ERROR_REGISTER_END 599
 ////////////////////////////////////
 
 

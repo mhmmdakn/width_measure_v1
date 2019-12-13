@@ -1,0 +1,67 @@
+
+<html>
+<head>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<link rel='stylesheet' href='/style.css'>
+<script>
+function loadXMLDoc() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var myObj = JSON.parse(this.responseText);
+      document.getElementById('cwidth_val').innerHTML = myObj.cwidth_val;
+      document.getElementById('mwidth_val').innerHTML = myObj.mwidth_val;
+      document.getElementById('fabric_ref').innerHTML = myObj.fabric_ref;
+      document.getElementById('number_of_samples').innerHTML = myObj.number_of_samples;
+    }
+  };
+  xhttp.open('GET', '/data', true);
+  xhttp.send();
+}
+setInterval(()=>{if (!document.hidden)loadXMLDoc();},1000);
+</script>
+</head>
+<body>
+  <div class='pill-nav'>
+  <div class='logo'>
+ <b style='color:blue;'>REAL</b><b style='color:orange;'>TEKNO</b>  
+ <div class='model' ><b >VHBM-181128-V2</b></div>
+ </div>
+ <div style='float: right;position: relative;top: 20px;right: 20px;'><a href='/login?DISCONNECT=YES'>Logout</a></div>
+  <a class='active' href='/'>Dashboard</a>
+  <a href='/wifi_settings.html'>Wifi Settings</a>
+  <a href='/device_settings.html'>Device Settings</a>
+</div>    
+<div class='row'>
+  <div class='column'>
+    <div class='card'>
+      <h5>Sensor Position</h5>
+      <h1 id='cwidth_val' style='color:blue;'>--</h1>
+      <h5>mm</h5>
+    </div>
+  </div>
+  <div class='column'>
+    <div class='card'>
+      <h5>Average Value</h5>
+      <h1 id='mwidth_val' style='color:red;'>--</h1>
+      <h5>mm</h5>
+    </div>
+  </div>
+  <div class='column'>
+    <div class='card'>
+      <h5>Reference Value</h5>
+      <h1 id='fabric_ref' style='color:orange;'>--</h1>
+      <h5>mm</h5>
+    </div>
+  </div> 
+  <div class='column'>
+    <div class='card'>
+      <h5>Number of Sampling</h5>
+      <h1 id='number_of_samples' style='color:green;'>--</h1>
+      <h5>__</h5>
+    </div>
+  </div>
+</div>
+</body>
+</html>
+

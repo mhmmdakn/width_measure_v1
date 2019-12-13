@@ -1,7 +1,11 @@
 #include <Arduino.h>
+#include <ESPAsyncWebServer.h>
+#include "ESPAsyncTCP.h"
 #include <Arduino_JSON.h>
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
+#include <EEPROM.h>
+
 //#include <ESP8266WebServer.h>
 
 //#include "EEPROM.h"
@@ -50,12 +54,8 @@ void mb_read_holding_register(int start_address,int number_of_value);
 void mb_write_holding_register(int start_address,int number_of_value);
 void checkLoop(int start_address,int timeout_count);
 bool checkRX(int Start);
-void handleData();
-void handleRoot();
-void handlePublic();
-void handleWifiSet();
-void handleDeviceSet();
-void handleLogin();
-void css();
-
+void handleNotFound(AsyncWebServerRequest *request);
+void handlePage(AsyncWebServerRequest *request);
+void handleData(AsyncWebServerRequest *request);
+void processorWrite(String name, String value);
 

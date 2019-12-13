@@ -1,12 +1,10 @@
 #include <main.h>
-#include <ESPAsyncWebServer.h>
-#include "ESPAsyncTCP.h"
 
-//#define DEBUG_MODE
-void handleNotFound(AsyncWebServerRequest *request);
+#define DEBUG_MODE
 
 COMM cm;
 WiFiClient client;
+String redirectURL="/dashboard.html";
 //ESP8266WebServer server(80);
 
 byte ByteArrayTx[127]={0};
@@ -73,29 +71,27 @@ void setup(){
     if (i == 7)
       {
         #ifdef DEBUG_MODE
-        //Serial.print("Could not connect to");  
+        Serial.print("Could not connect to");  
         #endif    
         ESP.restart();
       }
       else
       {
         #ifdef DEBUG_MODE
-       // Serial.print("Connected! IP address: ");
-       // Serial.println(WiFi.localIP());
+        Serial.print("Connected! IP address: ");
+        Serial.println(WiFi.localIP());
        #endif
       
       }
  
   //aktif edilecek 
-    // server.on("/", handleRoot);
-    // server.on("/public", handlePublic);
-    // server.on("/wifi_settings", handleWifiSet);
-    // server.on("/device_settings", handleDeviceSet);
-    // server.on("/data", handleData);
-    // server.on("/login", handleLogin);
-    // server.on("/css", css);
-    // server.onNotFound(handleNotFound);
-
+     server.on("/",handlePage);
+     server.on("/public.html", handlePage);
+     server.on("/wifi_settings.html", handlePage);
+     server.on("/device_settings.html", handlePage);
+     server.on("/data", handleData);     
+     server.onNotFound(handleNotFound);
+     server.begin(); 
     // //here the list of headers to be recorded
     // const char * headerkeys[] = {"User-Agent", "Cookie"} ;
     // size_t headerkeyssize = sizeof(headerkeys) / sizeof(char*);
@@ -106,14 +102,59 @@ void setup(){
 
     // cm.device_register[ap_sta_mod][0]=1;
     // cm.st_update(ap_sta_mod);
-    cm.device_register[wifi_ok][0]=1;
-    cm.st_update(wifi_ok);
+   // cm.device_register[wifi_ok][0]=1;
+    //cm.st_update(wifi_ok);
   //aktif edilecek
 
-server.onNotFound(handleNotFound);
-server.begin();
+
 update=true;
 }
+
+void loop(){
+
+  
+  //server.handleClient();
+  if(receive_update()){
+
+      update=true;
+         
+  }
+  byteFN= MB_FC_WRITE_REGISTER;
+  // if(WiFi.status() != WL_CONNECTED){    
+  //   cm.device_register[wifi_ok][0]=0;
+  //   cm.st_update(wifi_ok);    
+  // }
+  if (client&&client.connected()) 
+  {   
+    if(update)
+    {
+      if(end_of_work_trigger){      
+
+        end_of_work_trigger=false;      
+        mb_write_holding_register(end_of_work,1);               
+        checkLoop(end_of_work,20);
+
+      }
+      mb_write_holding_register(cwidth_val,4);     
+      checkLoop(cwidth_val,20);
+    }
+    else if((millis()-start_time)>3000)
+    {
+        mb_read_holding_register(end_of_work,1);        
+        checkLoop(end_of_work,20);
+        start_time =millis();
+    }
+    delay(10);
+  }
+  else
+  {
+   // Serial.println("client not connect");
+     client.connect(IPAddress(10,7,11,190),502);
+      delay(5000);
+  }
+    
+}
+
 
 String dataTypeGet(String path)
 {
@@ -201,7 +242,94 @@ void handleNotFound(AsyncWebServerRequest *request)
   request->send(404, "text/plain", message);
   Serial.print(message);
 }
+void handlePage(AsyncWebServerRequest *request)
+{
 
+  
+  if (request->authenticate("admin", "realtekno", "Measuring Width"))
+  {
+    if (request->method() == HTTP_POST)
+    {
+      for (uint8_t i = 0; i < request->params(); i++)
+      {
+        AsyncWebParameter *p = request->getParam(i);
+        processorWrite(p->name(), p->value());
+      }
+    }
+
+    loadFromSdCard(request, request->url());
+    return;
+  }
+  else
+  {
+    request->requestAuthentication("Measuring Width", true, redirectURL);
+    ///AsyncWebServerResponse * r = beginResponse(401,"text/html","<script> window.location.href='"+redirectUrl+"'</script>");//  requestAuthentication overload
+    return;
+  }
+}
+void handleData(AsyncWebServerRequest *request){
+  JSONVar myObject; 
+//  cm.device_register[updt][0]=1;
+//  cm.st_update(updt);
+//****st_update in success ini seçenekli yapıp dene
+//  while(!cm.device_register_check())
+//  delay(100);
+  myObject["cwidth_val"]=word(cm.device_register[cwidth_val][1],cm.device_register[cwidth_val][0]);
+  myObject["mwidth_val"]=word(cm.device_register[mwidth_val][1],cm.device_register[mwidth_val][0]);
+  myObject["number_of_samples"]=word(cm.device_register[number_of_samples][1],cm.device_register[number_of_samples][0]);
+  myObject["fabric_ref"]=word(cm.device_register[fabric_ref][1],cm.device_register[fabric_ref][0]);
+  String jsonString = JSON.stringify(myObject);
+  
+  request->send(200, "text/plane",jsonString);
+
+}
+void processorWrite(String name, String value)
+{
+  
+  // short address = name.toInt();
+  // Serial.print(address);
+  // Serial.print("--");
+  // Serial.println((uint8_t)value.toInt());
+  // if (address > 0)
+  // {
+  //   if (address <= WIFI_BEGIN_END)
+  //     EEPROM.writeString(address, value);
+  //   else if (address <= WIFI_CONFIG_END)
+  //     EEPROM.writeByte(address, (uint8_t)value.toInt());
+  //   else if (address <= ETH_CONFIG_END)
+  //     EEPROM.writeByte(address, (uint8_t)value.toInt());
+  //   else if (address <= DEVICE_CONFIG_END)
+  //     EEPROM.writeShort(address, (int16_t)value.toInt());
+  //   else if (address <= PLASTIK_END)
+  //     EEPROM.writeShort(address, (int16_t)value.toInt());
+
+  //   EEPROM.commit();
+  //   registerUpdate();
+  // }
+
+  
+}
+
+String processorRead(const String &var)
+{
+ //todo:last
+  // short address = var.toInt();
+  // if (address > 0)
+  // {
+  //   if (address <= WIFI_BEGIN_END)
+  //     return String((const char*)cm.wifi_begin[address]);
+  //   else if (address <= WIFI_CONFIG_END)
+  //     return String(EEPROM.readByte(address));
+  //   else if (address <= ETH_CONFIG_END)
+  //     return String(EEPROM.readByte(address));
+  //   else if (address <= DEVICE_CONFIG_END)
+  //     return String(EEPROM.readShort(address));
+  //   else if (address <= PLASTIK_END)
+  //     return String(EEPROM.readShort(address));
+  // }
+
+  // return String();
+}
 
 
 bool checkRX(int Start){
@@ -286,50 +414,6 @@ void checkLoop(int start_address,int timeout_count){
 
 }
 
-void loop(){
-
-  
-  //server.handleClient();
-  if(receive_update()){
-
-      update=true;
-         
-  }
-  byteFN= MB_FC_WRITE_REGISTER;
-  // if(WiFi.status() != WL_CONNECTED){    
-  //   cm.device_register[wifi_ok][0]=0;
-  //   cm.st_update(wifi_ok);    
-  // }
-  if (client&&client.connected()) 
-  {   
-    if(update)
-    {
-      if(end_of_work_trigger){      
-
-        end_of_work_trigger=false;      
-        mb_write_holding_register(end_of_work,1);               
-        checkLoop(end_of_work,20);
-
-      }
-      mb_write_holding_register(cwidth_val,4);     
-      checkLoop(cwidth_val,20);
-    }
-    else if((millis()-start_time)>3000)
-    {
-        mb_read_holding_register(end_of_work,1);        
-        checkLoop(end_of_work,20);
-        start_time =millis();
-    }
-    delay(10);
-  }
-  else
-  {
-   // Serial.println("client not connect");
-     client.connect(IPAddress(10,7,11,190),502);
-      delay(5000);
-  }
-    
-}
 
 
 void mb_read_holding_register(int start_address,int number_of_value)
@@ -434,21 +518,7 @@ void mod(){
 
 
 //login page, also called for disconnect
-// void handleData(){
-//   JSONVar myObject; 
-// //  cm.device_register[updt][0]=1;
-// //  cm.st_update(updt);
-// //****st_update in success ini seçenekli yapıp dene
-// //  while(!cm.device_register_check())
-// //  delay(100);
-//   myObject["cwidth_val"]=word(cm.device_register[cwidth_val][1],cm.device_register[cwidth_val][0]);
-//   myObject["mwidth_val"]=word(cm.device_register[mwidth_val][1],cm.device_register[mwidth_val][0]);
-//   myObject["number_of_samples"]=word(cm.device_register[number_of_samples][1],cm.device_register[number_of_samples][0]);
-//   myObject["fabric_ref"]=word(cm.device_register[fabric_ref][1],cm.device_register[fabric_ref][0]);
-//   String jsonString = JSON.stringify(myObject);
-//   server.send(200, "text/plane",jsonString);
 
-// }
 // void css(){
  
 // server.send(200, "text/css", style_css);
