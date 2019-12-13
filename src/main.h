@@ -57,5 +57,5 @@ void handleWifiSet();
 void handleDeviceSet();
 void handleLogin();
 void css();
-void handleNotFound();
+
 

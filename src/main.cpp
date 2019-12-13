@@ -3,17 +3,7 @@
 #include "ESPAsyncTCP.h"
 
 //#define DEBUG_MODE
-
-
-void handlePage(AsyncWebServerRequest *request)
-{
-
-}
-void handleNotFound(AsyncWebServerRequest *request)
-{
-
- 
-}
+void handleNotFound(AsyncWebServerRequest *request);
 
 COMM cm;
 WiFiClient client;
@@ -119,15 +109,98 @@ void setup(){
     cm.device_register[wifi_ok][0]=1;
     cm.st_update(wifi_ok);
   //aktif edilecek
-server.on("/",handlePage);
 
+server.onNotFound(handleNotFound);
 server.begin();
 update=true;
 }
 
+String dataTypeGet(String path)
+{
+  String dataType = "text/plain";
 
+  if (path.endsWith(".src"))
+    path = path.substring(0, path.lastIndexOf("."));
+  else if (path.endsWith(".htm"))
+    dataType = "text/html";
+  else if (path.endsWith(".html"))
+    dataType = "text/html";
+  else if (path.endsWith(".css"))
+    dataType = "text/css";
+  else if (path.endsWith(".js"))
+    dataType = "application/javascript";
+  else if (path.endsWith(".png"))
+    dataType = "image/png";
+  else if (path.endsWith(".gif"))
+    dataType = "image/gif";
+  else if (path.endsWith(".jpg"))
+    dataType = "image/jpeg";
+  else if (path.endsWith(".ico"))
+    dataType = "image/x-icon";
+  else if (path.endsWith(".xml"))
+    dataType = "text/xml";
+  else if (path.endsWith(".pdf"))
+    dataType = "application/pdf";
+  else if (path.endsWith(".zip"))
+    dataType = "application/zip";
+  else if (path.endsWith(".csv"))
+    dataType = "text/csv";
+  else if (path.endsWith(".gz"))
+    dataType = "application/x-gzip";
+  return dataType;
+}
+bool loadFromSdCard(AsyncWebServerRequest *request, String path)
+{
 
+  AsyncWebServerResponse *response;
+  if (path.endsWith("/"))
+    path += "dashboard.html";
+  String dataType = dataTypeGet(path);
 
+  String pathWithGz = path + ".gz";
+  if ((SPIFFS.exists(pathWithGz) || SPIFFS.exists(path)))
+  {
+    if (SPIFFS.exists(pathWithGz))
+    {
+      path = pathWithGz;
+      dataType = "application/x-gzip";
+    }
+  }
+
+  if (!SPIFFS.exists(path.c_str()))
+    return false;
+  // if (dataType == "text/html")
+  //   response = request->beginResponse(SD, path, dataType, false, processorRead);
+  
+  response = request->beginResponse(SPIFFS, path, dataType, false);
+  request->send(response);
+
+  return true;
+}
+
+void handleNotFound(AsyncWebServerRequest *request)
+{
+
+  if (loadFromSdCard(request, request->url()))
+  {
+    return;
+  }
+  String message = "\nNo Handler\r\n";
+  message += "URI: ";
+  message += request->url();
+  message += "\nMethod: ";
+  message += (request->method() == HTTP_GET) ? "GET" : "POST";
+  message += "\nParameters: ";
+  message += request->params();
+  message += "\n";
+  for (uint8_t i = 0; i < request->params(); i++)
+  {
+    AsyncWebParameter *p = request->getParam(i);
+    message += String(p->name().c_str()) + " : " + String(p->value().c_str()) + "\r\n";
+  }
+  request->send(404, "text/plain", message);
+  Serial.print(message);
+}
 
 
 
