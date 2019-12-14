@@ -57,8 +57,9 @@ void setup(){
   WiFi.disconnect();
     delay(1000) ;
     WiFi.mode(WIFI_STA);
-    WiFi.config(IPAddress(10,7,11,100),IPAddress(10,7,11,250),IPAddress(255,255,255,0));
-    WiFi.begin("PDA","Pda12345678");
+   // WiFi.config(IPAddress(10,7,11,100),IPAddress(10,7,11,250),IPAddress(255,255,255,0));
+    WiFi.config(IPAddress(192,168,1,150),IPAddress(192,168,1,1),IPAddress(255,255,255,0));
+    WiFi.begin("REALTEKNO","20192019");
     delay(1000) ;  
     WiFi.setAutoConnect(true);
     WiFi.setAutoReconnect(true);  
@@ -210,9 +211,9 @@ bool loadFromSdCard(AsyncWebServerRequest *request, String path)
 
   if (!SPIFFS.exists(path.c_str()))
     return false;
-  // if (dataType == "text/html")
-  //   response = request->beginResponse(SD, path, dataType, false, processorRead);
-  
+   if (dataType == "text/html")
+     response = request->beginResponse(SPIFFS, path, dataType, false, processorRead);
+  else
   response = request->beginResponse(SPIFFS, path, dataType, false);
   request->send(response);
 
@@ -313,22 +314,25 @@ void processorWrite(String name, String value)
 String processorRead(const String &var)
 {
  //todo:last
-  // short address = var.toInt();
-  // if (address > 0)
-  // {
-  //   if (address <= WIFI_BEGIN_END)
-  //     return String((const char*)cm.wifi_begin[address]);
-  //   else if (address <= WIFI_CONFIG_END)
-  //     return String(EEPROM.readByte(address));
-  //   else if (address <= ETH_CONFIG_END)
-  //     return String(EEPROM.readByte(address));
-  //   else if (address <= DEVICE_CONFIG_END)
-  //     return String(EEPROM.readShort(address));
-  //   else if (address <= PLASTIK_END)
-  //     return String(EEPROM.readShort(address));
-  // }
 
-  // return String();
+  short kategori_index=var.indexOf('_');
+  String kategori = var.substring(0,kategori_index);
+  short register_index1=var.indexOf('_',kategori_index+1);
+  short register_num1 = var.substring(kategori_index+1,register_index1).toInt();
+  short register_index2=var.indexOf('_',register_index1+1);
+  short register_num2 = var.substring(register_index1+1,register_index2).toInt();
+  Serial.println("processor Read");
+  
+  if (kategori=="wb")
+    return String((const char*)cm.wifi_begin[register_num1]);
+  else if (kategori=="wc")
+    return String(cm.wifi_config[register_num1][register_num2]);
+  else if (kategori=="dc")
+    return String(cm.device_config[register_num1][register_num2]);
+  else if (kategori=="dr")
+    return String(cm.device_register[register_num1][register_num2]);
+
+   return String();
 }
 
 

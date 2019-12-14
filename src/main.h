@@ -59,3 +59,4 @@ void handlePage(AsyncWebServerRequest *request);
 void handleData(AsyncWebServerRequest *request);
 void processorWrite(String name, String value);
 
+String processorRead(const String &var);
