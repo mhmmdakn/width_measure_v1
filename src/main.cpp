@@ -1,6 +1,6 @@
 #include <main.h>
 
-#define DEBUG_MODE
+//#define DEBUG_MODE
 
 COMM cm;
 WiFiClient client;
@@ -15,8 +15,10 @@ byte wifiMod=STA_MOD;
 boolean flagClientConnected = 0;
 byte byteFN = MB_FC_NONE;
 bool end_of_work_trigger=false;
-
+bool post_event=false;
+bool loop_state=false;
 bool update=false;
+bool plc_status=false;
 AsyncWebServer server(80);
 
 void setup(){
@@ -25,41 +27,48 @@ void setup(){
   delay(1000); 
   if (!SPIFFS.begin())
   {
+    #ifdef DEBUG_MODE
     Serial.println("An Error has occurred while mounting SPIFFS");
+    #endif
   }
 
   pinMode(2,OUTPUT);
   digitalWrite(2,LOW);
-
+  delay(500);
   ////
-    // cm.device_register[wifi_ok][0]=0;
-    // cm.st_update(wifi_ok);
+    cm.device_register[wifi_ok][0]=0;
+    cm.st_update(wifi_ok);
 
-    // while(!cm.wifi_begin_check())
-    // delay(1500);
-    // while(!cm.wifi_config_check())
-    // delay(1000);
-    // while(!cm.device_config_check())
-    // delay(500);
+    while(!cm.wifi_begin_check())
+    delay(1500);
+    while(!cm.wifi_config_check())
+    delay(1000);
+    while(!cm.device_config_check())
+    delay(500);
     
 
-    // IPAddress STA_IP(cm.wifi_config[sta_ip]);
-    // IPAddress STA_DNS(cm.wifi_config[sta_dns]);
-    // IPAddress STA_GATEWAY(cm.wifi_config[sta_gateway]);
-    // IPAddress SUBNET(cm.wifi_config[subnet]);
-  
-
- 
-    // WiFi.config(STA_IP,STA_DNS,STA_GATEWAY,SUBNET);  
-    // WiFi.begin((const char*)cm.wifi_begin[sta_ssid],(const char*)cm.wifi_begin[sta_password]);
+    
   ///
 
   WiFi.disconnect();
     delay(1000) ;
     WiFi.mode(WIFI_STA);
    // WiFi.config(IPAddress(10,7,11,100),IPAddress(10,7,11,250),IPAddress(255,255,255,0));
-    WiFi.config(IPAddress(192,168,1,150),IPAddress(192,168,1,1),IPAddress(255,255,255,0));
-    WiFi.begin("REALTEKNO","20192019");
+   // WiFi.config(IPAddress(192,168,1,150),IPAddress(192,168,1,1),IPAddress(255,255,255,0));
+    
+    //WiFi.begin("REALTEKNO","20192019");
+    IPAddress STA_IP(cm.wifi_config[sta_ip]);
+    IPAddress STA_DNS(cm.wifi_config[sta_dns]);
+    IPAddress STA_GATEWAY(cm.wifi_config[sta_gateway]);
+    IPAddress SUBNET(cm.wifi_config[subnet]);
+
+
+
+    WiFi.config(STA_IP,STA_DNS,STA_GATEWAY,SUBNET);  
+    WiFi.begin((const char*)cm.wifi_begin[sta_ssid],(const char*)cm.wifi_begin[sta_password]);
+
+
+
     delay(1000) ;  
     WiFi.setAutoConnect(true);
     WiFi.setAutoReconnect(true);  
@@ -93,18 +102,12 @@ void setup(){
      server.on("/data", handleData);     
      server.onNotFound(handleNotFound);
      server.begin(); 
-    // //here the list of headers to be recorded
-    // const char * headerkeys[] = {"User-Agent", "Cookie"} ;
-    // size_t headerkeyssize = sizeof(headerkeys) / sizeof(char*);
-    // //ask server to track these headers
-    // server.collectHeaders(headerkeys, headerkeyssize);
-    // server.begin(); 
 
 
     // cm.device_register[ap_sta_mod][0]=1;
     // cm.st_update(ap_sta_mod);
-   // cm.device_register[wifi_ok][0]=1;
-    //cm.st_update(wifi_ok);
+   cm.device_register[wifi_ok][0]=1;
+    cm.st_update(wifi_ok);
   //aktif edilecek
 
 
@@ -115,45 +118,63 @@ void loop(){
 
   
   //server.handleClient();
-  if(receive_update()){
+  if(!post_event){
 
-      update=true;
-         
-  }
-  byteFN= MB_FC_WRITE_REGISTER;
-  // if(WiFi.status() != WL_CONNECTED){    
-  //   cm.device_register[wifi_ok][0]=0;
-  //   cm.st_update(wifi_ok);    
-  // }
-  if (client&&client.connected()) 
-  {   
-    if(update)
-    {
-      if(end_of_work_trigger){      
+    loop_state=true;
+    if(receive_update()){
 
-        end_of_work_trigger=false;      
-        mb_write_holding_register(end_of_work,1);               
-        checkLoop(end_of_work,20);
+        update=true;
+            
+    }
+    byteFN= MB_FC_WRITE_REGISTER;
+    // if(WiFi.status() != WL_CONNECTED){    
+    //   cm.device_register[wifi_ok][0]=0;
+    //   cm.st_update(wifi_ok);    
+    // }
+    if (client&&client.connected()) 
+    {   
+      plc_status=true;
+      if(update)
+      {
+        if(end_of_work_trigger){      
 
+          end_of_work_trigger=false;      
+          mb_write_holding_register(end_of_work,1);               
+          checkLoop(end_of_work,20);
+
+        }
+        mb_write_holding_register(cwidth_val,4);     
+        checkLoop(cwidth_val,20);
       }
-      mb_write_holding_register(cwidth_val,4);     
-      checkLoop(cwidth_val,20);
+      else if((millis()-start_time)>3000)
+      {
+          mb_read_holding_register(end_of_work,1);        
+          checkLoop(end_of_work,20);
+          start_time =millis();
+      }
+      delay(10);
     }
-    else if((millis()-start_time)>3000)
+    else
     {
-        mb_read_holding_register(end_of_work,1);        
-        checkLoop(end_of_work,20);
-        start_time =millis();
+        plc_status=false;
+      // Serial.println("client not connect");
+        client.connect(IPAddress(10,7,11,190),502);
+        delay(1000);
     }
-    delay(10);
   }
   else
   {
-   // Serial.println("client not connect");
-     client.connect(IPAddress(10,7,11,190),502);
-      delay(5000);
-  }
+      
+      
+      cm.write(WIFI_CONFIG,wifi_config_size*wifi_config_lenght,(byte*)cm.wifi_config,DATA_TYPE_8);
+      cm.write(WIFI_BEGIN,wifi_begin_size*wifi_begin_lenght,(byte*)cm.wifi_begin,DATA_TYPE_8);
+      cm.write(DEVICE_CONFIG,device_config_size,(byte*)cm.device_config,DATA_TYPE_16);  
+      while(!cm.save());
+
+      post_event=false;
     
+  }
+  
 }
 
 
@@ -199,15 +220,15 @@ bool loadFromSdCard(AsyncWebServerRequest *request, String path)
     path += "dashboard.html";
   String dataType = dataTypeGet(path);
 
-  String pathWithGz = path + ".gz";
-  if ((SPIFFS.exists(pathWithGz) || SPIFFS.exists(path)))
-  {
-    if (SPIFFS.exists(pathWithGz))
-    {
-      path = pathWithGz;
-      dataType = "application/x-gzip";
-    }
-  }
+  // String pathWithGz = path + ".gz";
+  // if ((SPIFFS.exists(pathWithGz) || SPIFFS.exists(path)))
+  // {
+  //   if (SPIFFS.exists(pathWithGz))
+  //   {
+  //     path = pathWithGz;
+  //     dataType = "application/x-gzip";
+  //   }
+  // }
 
   if (!SPIFFS.exists(path.c_str()))
     return false;
@@ -241,7 +262,9 @@ void handleNotFound(AsyncWebServerRequest *request)
     message += String(p->name().c_str()) + " : " + String(p->value().c_str()) + "\r\n";
   }
   request->send(404, "text/plain", message);
+  #ifdef DEBUG_MODE
   Serial.print(message);
+  #endif
 }
 void handlePage(AsyncWebServerRequest *request)
 {
@@ -251,11 +274,15 @@ void handlePage(AsyncWebServerRequest *request)
   {
     if (request->method() == HTTP_POST)
     {
+      post_event=true;
+      
+      
       for (uint8_t i = 0; i < request->params(); i++)
       {
         AsyncWebParameter *p = request->getParam(i);
         processorWrite(p->name(), p->value());
       }
+
     }
 
     loadFromSdCard(request, request->url());
@@ -275,6 +302,7 @@ void handleData(AsyncWebServerRequest *request){
 //****st_update in success ini seçenekli yapıp dene
 //  while(!cm.device_register_check())
 //  delay(100);
+  myObject["plc_sta"]=plc_status;
   myObject["cwidth_val"]=word(cm.device_register[cwidth_val][1],cm.device_register[cwidth_val][0]);
   myObject["mwidth_val"]=word(cm.device_register[mwidth_val][1],cm.device_register[mwidth_val][0]);
   myObject["number_of_samples"]=word(cm.device_register[number_of_samples][1],cm.device_register[number_of_samples][0]);
@@ -286,53 +314,42 @@ void handleData(AsyncWebServerRequest *request){
 }
 void processorWrite(String name, String value)
 {
-  
-  // short address = name.toInt();
-  // Serial.print(address);
-  // Serial.print("--");
-  // Serial.println((uint8_t)value.toInt());
-  // if (address > 0)
-  // {
-  //   if (address <= WIFI_BEGIN_END)
-  //     EEPROM.writeString(address, value);
-  //   else if (address <= WIFI_CONFIG_END)
-  //     EEPROM.writeByte(address, (uint8_t)value.toInt());
-  //   else if (address <= ETH_CONFIG_END)
-  //     EEPROM.writeByte(address, (uint8_t)value.toInt());
-  //   else if (address <= DEVICE_CONFIG_END)
-  //     EEPROM.writeShort(address, (int16_t)value.toInt());
-  //   else if (address <= PLASTIK_END)
-  //     EEPROM.writeShort(address, (int16_t)value.toInt());
-
-  //   EEPROM.commit();
-  //   registerUpdate();
-  // }
-
-  
+  if(name!=""){
+    short kategori_index=name.indexOf('_');
+    String kategori = name.substring(0,kategori_index);
+    short register_index1=name.indexOf('_',kategori_index+1);
+    short register_num1 = name.substring(kategori_index+1,register_index1).toInt();  
+    short register_num2 = name.substring(register_index1+1,name.length()).toInt();
+ 
+      if (kategori=="wb")  
+        cm.wifi_begin_update(register_num1,value);
+      else if (kategori=="wc")
+        cm.wifi_config[register_num1][register_num2]=value.toInt();
+      else if (kategori=="dc")
+        cm.device_config_update(register_num1,value);
+  }
 }
 
 String processorRead(const String &var)
 {
  //todo:last
-
-  short kategori_index=var.indexOf('_');
-  String kategori = var.substring(0,kategori_index);
-  short register_index1=var.indexOf('_',kategori_index+1);
-  short register_num1 = var.substring(kategori_index+1,register_index1).toInt();
-  short register_index2=var.indexOf('_',register_index1+1);
-  short register_num2 = var.substring(register_index1+1,register_index2).toInt();
-  Serial.println("processor Read");
-  
-  if (kategori=="wb")
-    return String((const char*)cm.wifi_begin[register_num1]);
-  else if (kategori=="wc")
-    return String(cm.wifi_config[register_num1][register_num2]);
-  else if (kategori=="dc")
-    return String(cm.device_config[register_num1][register_num2]);
-  else if (kategori=="dr")
-    return String(cm.device_register[register_num1][register_num2]);
-
-   return String();
+  if(var!=""){  
+    short kategori_index=var.indexOf('_');
+    String kategori = var.substring(0,kategori_index);
+    short register_index1=var.indexOf('_',kategori_index+1);
+    short register_num1 = var.substring(kategori_index+1,register_index1).toInt();  
+    short register_num2 = var.substring(register_index1+1,var.length()).toInt();
+    
+    if (kategori=="wb")  
+      return String((char*)cm.wifi_begin[register_num1]);
+    else if (kategori=="wc")
+      return String(cm.wifi_config[register_num1][register_num2]);
+    else if (kategori=="dc")
+      return String(cm.DCToStr(register_num1));
+    else if (kategori=="dr")
+      return String(cm.DRToStr(register_num1));
+  }
+    return String();
 }
 
 
@@ -464,7 +481,7 @@ void mb_write_holding_register(int start_address,int number_of_value)
 
 bool receive_update() {
 
-   //if(cm.serialEventEN){
+  
     if(Serial.available())
     {      
       cm.stRxData[FUNC]=Serial.read();
@@ -488,7 +505,7 @@ bool receive_update() {
     return false;
 
     return false;
-  //}
+ 
 }
 
 void mod(){

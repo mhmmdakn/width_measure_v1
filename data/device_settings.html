@@ -1,0 +1,69 @@
+<html>
+<head>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<link rel='stylesheet' href='/style.css'>
+</head>
+<body>
+  <div class='pill-nav'>
+  <div class='logo'>
+ <b style='color:blue;'>REAL</b><b style='color:orange;'>TEKNO</b>   
+ <div class='model' ><b >VHBM-181128-V2</b></div>
+ </div>
+ 
+  <a href='/'>Dashboard</a>
+  <a href='/wifi_settings.html'>Wifi Settings</a>
+  <a class='active' href='/device_settings.html'>Device Settings</a>
+</div>    
+<div class='row'>
+  <div class='col-100'>
+    <div class='container'>
+      <form action='/device_settings.html' method='POST'> 
+      <input type='hidden' name='form'>         
+        <div class='row'>
+          <div class='col-100'>
+            <h3>Device Settings</h3>
+              <div class='row'>
+              <div class='column'>
+               <label for='distance_val1'>Reference Value (mm)</label>
+               <input type='text' name='dc_0_0' placeholder='2044' value='%dc_0_0%'>
+              </div>
+              <div class='column'>
+               <label for='sleep_t'>Sleep Time (sec)</label>
+               <input type='text' name='dc_12_0' placeholder='300' value='%dc_12_0%'>
+              </div>
+              <div class='column'>
+               <label for='sampling_range'>Sampling Range (pulse)</label>
+               <input type='text' name='dc_13_0' placeholder='100' value='%dc_13_0%'>
+              </div>
+              <div class='column'>
+               <label for='number_of_samples_for_fabric'>Sampling Reference </label>
+               <input type='text' name='dc_14_0' placeholder='5' value='%dc_14_0%'>
+              </div>              
+             </div> 
+             <div class='row'>
+              <div class='column'>
+               <label for='tolerance'>Tolerance (mm)</label>
+               <input type='text' name='dc_15_0' placeholder='50' value='%dc_15_0%'>
+              </div>
+              <div class='column'>
+               <label for='encoder_rev_pulse'>Encoder Pulse</label>
+               <input type='text' name='dc_2_0' placeholder='400' value='%dc_2_0%'>
+              </div>
+              <div class='column'>
+               <label for='circle_dim'>Circle Dim. (mm)</label>
+               <input type='text' name='dc_3_0' placeholder='60' value='%dc_3_0%'>
+              </div>
+              <div class='column'>
+               <label for='step_rev_pulse'>Step Pulse</label>
+               <input type='text' name='dc_4_0' placeholder='1600' value='%dc_4_0%'>
+              </div>              
+             </div> 
+          </div>                  
+        <button type='submit'>Save</button>
+      </form>
+    </div>
+  </div>
+</div>
+</body>
+</html>
+

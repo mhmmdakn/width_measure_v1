@@ -33,11 +33,11 @@
 
 
 ///////Register Start Address///////
-#define WIFI_BEGIN 100
-#define WIFI_CONFIG 200
-#define DEVICE_CONFIG 300
-#define DEVICE_REGISTER 400
-#define ERROR_REGISTER 500
+#define WIFI_BEGIN 500
+#define WIFI_CONFIG 1000
+#define DEVICE_CONFIG 1500
+#define DEVICE_REGISTER 2000
+#define ERROR_REGISTER 2500
 ////////////////////////////////////
 
 ///////Register END Address///////
@@ -127,7 +127,7 @@ class COMM{
       byte stTxData[6]={0};     
 
       
-      byte wifi_begin[wifi_begin_size][wifi_begin_lenght];
+      char wifi_begin[wifi_begin_size][wifi_begin_lenght];
       byte wifi_config[wifi_config_size][wifi_config_lenght];
       byte device_config[device_config_size][device_config_lenght];
       byte device_register[device_register_size][device_register_lenght];

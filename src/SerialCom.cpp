@@ -222,13 +222,17 @@
     
     void COMM::wifi_begin_update(int index,String value)
     {
-      for(int i=0;i<value.length();i++)  
-      wifi_begin[index][i]=value[i];
+      value.toCharArray(wifi_begin[index],wifi_begin_lenght);
     }
     
     String COMM::DCToStr(int index){
       
       return String(word(device_config[index][1],device_config[index][0]));
+      
+    }
+    String COMM::DRToStr(int index){
+      
+      return String(word(device_register[index][1],device_register[index][0]));
       
     }
 

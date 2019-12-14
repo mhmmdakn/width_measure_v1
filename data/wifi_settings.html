@@ -1,0 +1,104 @@
+<html>
+<head>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<link rel='stylesheet' href='/style.css'>
+</head>
+<body>
+  <div class='pill-nav'>
+  <div class='logo'>
+ <b style='color:blue;'>REAL</b><b style='color:orange;'>TEKNO</b>   
+ <div class='model' ><b >VHBM-181128-V2</b></div>
+ </div>
+ 
+  <a href='/'>Dashboard</a>
+  <a class='active' href='/wifi_settings.html'>Wifi Settings</a>
+  <a href='/device_settings.html'>Device Settings</a>
+</div>    
+<div class='row'>
+  <div class='col-75'>
+    <div class='container'>
+      <form action='/wifi_settings.html' method='POST'>  
+           
+        <div class='row'>
+          <div class='col-50'>
+            <h3>Wifi Begin</h3>
+            <label for='sta_ssid'>STA SSID</label>
+            <input type='text' name='wb_0_0' placeholder='ssid' value='%wb_0_0%'>
+            <label for='sta_password'>STA PASSWORD </label>
+            <input type='text' name='wb_1_0' placeholder='password' value='%wb_1_0%'>
+            <label for='ap_ssid'> AP SSID</label>
+            <input type='text' name='wb_2_0' placeholder='ssid' value='%wb_2_0%'>
+            <label for='ap_password'> AP PASSWORD</label>
+            <input type='text' name='wb_3_0' placeholder='password' value='%wb_3_0%'>       
+          </div>
+          <div class='col-50'>
+            <h3>Wifi Config</h3>            
+            <label for='sta_ip'>IP</label>
+            <div class='row' style='padding-left:10px;'>
+              <div class='ip' >                
+                <input type='text' name='wc_0_0' placeholder='192' value='%wc_0_0%'>
+              </div>
+              <div class='ip'>                
+                <input type='text' name='wc_0_1' placeholder='168' value='%wc_0_1%'>
+              </div>
+              <div class='ip'>             
+                <input type='text' name='wc_0_2' placeholder='1' value='%wc_0_2%'>
+              </div>
+              <div class='ip'>               
+                <input type='text' name='wc_0_3' placeholder='100' value='%wc_0_3%'>
+              </div>
+            </div>
+             <label for='sta_ip'>SUBNET</label>
+            <div class='row' style='padding-left:10px;'>
+              <div class='ip' >                
+                <input type='text' name='wc_3_0' placeholder='255' value='%wc_3_0%'>
+              </div>
+              <div class='ip'>               
+                <input type='text' name='wc_3_1' placeholder='255' value='%wc_3_1%'>
+              </div>
+              <div class='ip'>               
+                <input type='text' name='wc_3_2' placeholder='255' value='%wc_3_2%'>
+              </div>
+              <div class='ip'>               
+                <input type='text' name='wc_3_3' placeholder='0' value='%wc_3_3%'>
+              </div>
+            </div>
+            <label for='sta_ip'>GATEWAY</label>
+            <div class='row' style='padding-left:10px;'>
+              <div class='ip' >          
+                <input type='text' name='wc_2_0' placeholder='192' value='%wc_2_0%'>
+              </div>
+              <div class='ip'>                
+                <input type='text' name='wc_2_1' placeholder='168' value='%wc_2_1%'>
+              </div>
+              <div class='ip'>                
+                <input type='text' name='wc_2_2' placeholder='1' value='%wc_2_2%'>
+              </div>
+              <div class='ip'>                
+                <input type='text' name='wc_2_3' placeholder='1' value='%wc_2_3%'>
+              </div>
+            </div>
+           <label for='sta_ip'>DNS</label>
+            <div class='row' style='padding-left:10px;'>
+              <div class='ip' >          
+                <input type='text' name='wc_1_0' placeholder='0' value='%wc_1_0%'>
+              </div>
+              <div class='ip'>                
+                <input type='text' name='wc_1_1' placeholder='0' value='%wc_1_1%'>
+              </div>
+              <div class='ip'>                
+                <input type='text' name='wc_1_2' placeholder='0' value='%wc_1_2%'>
+              </div>
+              <div class='ip'>                
+                <input type='text' name='wc_1_3' placeholder='0' value='%wc_1_3%'>
+              </div>             
+            </div>           
+          </div>          
+        </div>        
+        <button type='submit'>Save</button>
+      </form>
+    </div>
+  </div>
+</div>
+</body>
+</html>

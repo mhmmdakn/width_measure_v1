@@ -14,6 +14,16 @@ function loadXMLDoc() {
       document.getElementById('mwidth_val').innerHTML = myObj.mwidth_val;
       document.getElementById('fabric_ref').innerHTML = myObj.fabric_ref;
       document.getElementById('number_of_samples').innerHTML = myObj.number_of_samples;
+      if(myObj.plc_sta){
+        document.getElementById('plc_sta').innerText="PLC Online";
+        document.getElementById('plc_sta').style.color="green"
+      }
+      else
+      {
+        document.getElementById('plc_sta').innerText="PLC Offline";
+        document.getElementById('plc_sta').style.color="red"
+      }
+
     }
   };
   xhttp.open('GET', '/data', true);
@@ -28,7 +38,7 @@ setInterval(()=>{if (!document.hidden)loadXMLDoc();},1000);
  <b style='color:blue;'>REAL</b><b style='color:orange;'>TEKNO</b>  
  <div class='model' ><b >VHBM-181128-V2</b></div>
  </div>
- <div style='float: right;position: relative;top: 20px;right: 20px;'><a href='/login?DISCONNECT=YES'>Logout</a></div>
+ <div id="plc_sta" style='float: right;position: relative;top: 20px;right: 20px; color: red;'>PLC Offline</div>
   <a class='active' href='/'>Dashboard</a>
   <a href='/wifi_settings.html'>Wifi Settings</a>
   <a href='/device_settings.html'>Device Settings</a>
