@@ -297,19 +297,19 @@ void handlePage(AsyncWebServerRequest *request)
 }
 void handleData(AsyncWebServerRequest *request){
   JSONVar myObject; 
-//  cm.device_register[updt][0]=1;
-//  cm.st_update(updt);
-//****st_update in success ini seçenekli yapıp dene
-//  while(!cm.device_register_check())
-//  delay(100);
-  myObject["plc_sta"]=plc_status;
-  myObject["cwidth_val"]=word(cm.device_register[cwidth_val][1],cm.device_register[cwidth_val][0]);
-  myObject["mwidth_val"]=word(cm.device_register[mwidth_val][1],cm.device_register[mwidth_val][0]);
-  myObject["number_of_samples"]=word(cm.device_register[number_of_samples][1],cm.device_register[number_of_samples][0]);
-  myObject["fabric_ref"]=word(cm.device_register[fabric_ref][1],cm.device_register[fabric_ref][0]);
-  String jsonString = JSON.stringify(myObject);
-  
-  request->send(200, "text/plane",jsonString);
+  //  cm.device_register[updt][0]=1;
+  //  cm.st_update(updt);
+  //****st_update in success ini seçenekli yapıp dene
+  //  while(!cm.device_register_check())
+  //  delay(100);
+    myObject["plc_sta"]=plc_status;
+    myObject["cwidth_val"]=word(cm.device_register[cwidth_val][1],cm.device_register[cwidth_val][0]);
+    myObject["mwidth_val"]=word(cm.device_register[mwidth_val][1],cm.device_register[mwidth_val][0]);
+    myObject["number_of_samples"]=word(cm.device_register[number_of_samples][1],cm.device_register[number_of_samples][0]);
+    myObject["fabric_ref"]=word(cm.device_register[fabric_ref][1],cm.device_register[fabric_ref][0]);
+    String jsonString = JSON.stringify(myObject);
+    
+    request->send(200, "text/plane",jsonString);
 
 }
 void processorWrite(String name, String value)
@@ -509,7 +509,7 @@ bool receive_update() {
 }
 
 void mod(){
-    delay(1);
+    
     byte modData=Serial.read();
     if(modData==AP_STA_MOD){
       WiFi.disconnect();
@@ -523,178 +523,3 @@ void mod(){
       cm.st_update(ap_sta_mod);
     }
 }
-
-
-// bool is_authenticated() {
-//    if (server.hasHeader("Cookie")) {    
-//     String cookie = server.header("Cookie");
-    
-//     if (cookie.indexOf("ESPSESSIONID=1") != -1 ) {      
-//       return true;
-//     }
-
-//   }  
-//   return false;
-// }
-
-
-//login page, also called for disconnect
-
-// void css(){
- 
-// server.send(200, "text/css", style_css);
-// }
-// void handleLogin() {
-//   String msg;
-//   if (server.hasHeader("Cookie")) {    
-//     String cookie = server.header("Cookie");    
-//   }
-//   if (server.hasArg("DISCONNECT")) {    
-//     server.sendHeader("Location", "/login");
-//     server.sendHeader("Cache-Control", "no-cache");
-//     server.sendHeader("Set-Cookie", "ESPSESSIONID=0");
-//     server.send(301);
-//     return;
-//   }
-//   if (server.hasArg("uname") && server.hasArg("psw")) {
-
-//     if (server.arg("uname") == "admin" &&  server.arg("psw") == "realtekno") {
-//       server.sendHeader("Location", "/");
-//       server.sendHeader("Cache-Control", "no-cache");
-//       server.sendHeader("Set-Cookie", "ESPSESSIONID=1");
-//       server.send(301);
-//       return;
-//     }
-//   }
-//   String content=login_html;  
-//   content.replace("@uname",server.arg("uname"));
-//   server.send(200, "text/html", content);
-// }
-
-// //root page can be accessed only if authentication is ok
-// void handleRoot() {
-//   if (!is_authenticated()) {
-//     server.sendHeader("Location", "/login");
-//     server.sendHeader("Cache-Control", "no-cache");
-//     server.send(301);
-//     return;
-//   }
-//   server.send(200, "text/html", dashboard_html);
-// }
-// void handlePublic(){
-//   if (server.hasArg("reset")) {
-//     if(server.arg("reset")=="1"&&server.arg("pswd")=="martur1234")    
-//       cm.device_register[end_of_work][0]=1;
-//       cm.st_update(end_of_work);
-//       while(!cm.device_register_check())
-//       delay(100);
-//    }
-//   String content=public_html;
-//   word max=word(cm.device_config[distance_val1][1],cm.device_config[distance_val1][0]);
-//   word min=max-1230;
-//   content.replace("@min",String(min));
-//   content.replace("@max",String(max));
-//   server.send(200, "text/html", content);
-// }
-// void handleWifiSet() {
-  
-//   if (!is_authenticated()) {
-//     server.sendHeader("Location", "/login");
-//     server.sendHeader("Cache-Control", "no-cache");
-//     server.send(301);
-//     return;
-//   }
-
-//   if (server.hasArg("form")) {
-//     cm.wifi_begin_update(sta_ssid,server.arg("sta_ssid"));
-//     cm.wifi_begin_update(sta_password,server.arg("sta_password"));
-//     cm.wifi_begin_update(ap_ssid,server.arg("ap_ssid"));
-//     cm.wifi_begin_update(ap_password,server.arg("ap_password"));
-//     cm.wifi_config[sta_ip][0]=server.arg("sta_ip1").toInt();
-//     cm.wifi_config[sta_ip][1]=server.arg("sta_ip2").toInt();
-//     cm.wifi_config[sta_ip][2]=server.arg("sta_ip3").toInt();
-//     cm.wifi_config[sta_ip][3]=server.arg("sta_ip4").toInt();
-//     cm.wifi_config[subnet][0]=server.arg("subnet1").toInt();
-//     cm.wifi_config[subnet][1]=server.arg("subnet2").toInt();
-//     cm.wifi_config[subnet][2]=server.arg("subnet3").toInt();
-//     cm.wifi_config[subnet][3]=server.arg("subnet4").toInt();
-//     cm.wifi_config[sta_gateway][0]=server.arg("sta_gateway1").toInt();
-//     cm.wifi_config[sta_gateway][1]=server.arg("sta_gateway2").toInt();
-//     cm.wifi_config[sta_gateway][2]=server.arg("sta_gateway3").toInt();
-//     cm.wifi_config[sta_gateway][3]=server.arg("sta_gateway4").toInt();
-//     cm.wifi_config[sta_dns][0]=server.arg("dns1").toInt();
-//     cm.wifi_config[sta_dns][1]=server.arg("dns2").toInt();
-//     cm.wifi_config[sta_dns][2]=server.arg("dns3").toInt();
-//     cm.wifi_config[sta_dns][3]=server.arg("dns4").toInt();
-//     cm.write(WIFI_CONFIG,wifi_config_size*wifi_config_lenght,(byte*)cm.wifi_config,DATA_TYPE_8);
-//     cm.write(WIFI_BEGIN,wifi_begin_size*wifi_begin_lenght,(byte*)cm.wifi_begin,DATA_TYPE_8);  
-//     while(!cm.save());
-//   }
-//   String content=wifi_set_html;
-//   content.replace("@sta_ssid",(const char*)cm.wifi_begin[sta_ssid]);
-//   content.replace("@sta_password",(const char*)cm.wifi_begin[sta_password]);
-//   content.replace("@ap_ssid",(const char*)cm.wifi_begin[ap_ssid]);
-//   content.replace("@ap_password",(const char*)cm.wifi_begin[ap_password]);
-//   content.replace("@sta_ip1",String(cm.wifi_config[sta_ip][0]));
-//   content.replace("@sta_ip2",String(cm.wifi_config[sta_ip][1]));
-//   content.replace("@sta_ip3",String(cm.wifi_config[sta_ip][2]));
-//   content.replace("@sta_ip4",String(cm.wifi_config[sta_ip][3]));
-//   content.replace("@subnet1",String(cm.wifi_config[subnet][0]));
-//   content.replace("@subnet2",String(cm.wifi_config[subnet][1]));
-//   content.replace("@subnet3",String(cm.wifi_config[subnet][2]));
-//   content.replace("@subnet4",String(cm.wifi_config[subnet][3]));
-//   content.replace("@sta_gateway1",String(cm.wifi_config[sta_gateway][0]));
-//   content.replace("@sta_gateway2",String(cm.wifi_config[sta_gateway][1]));
-//   content.replace("@sta_gateway3",String(cm.wifi_config[sta_gateway][2]));
-//   content.replace("@sta_gateway4",String(cm.wifi_config[sta_gateway][3]));
-//   content.replace("@sta_dns1",String(cm.wifi_config[sta_dns][0]));
-//   content.replace("@sta_dns2",String(cm.wifi_config[sta_dns][1]));
-//   content.replace("@sta_dns3",String(cm.wifi_config[sta_dns][2]));
-//   content.replace("@sta_dns4",String(cm.wifi_config[sta_dns][3]));
-//   server.send(200, "text/html", content);
-// }
-// void handleDeviceSet() {
-//   if (!is_authenticated()) {
-//     server.sendHeader("Location", "/login");
-//     server.sendHeader("Cache-Control", "no-cache");
-//     server.send(301);
-//     return;
-//   }
-//   if (server.hasArg("form")) {
-//     cm.device_config_update(distance_val1,server.arg("distance_val1"));
-//     cm.device_config_update(sleep_t,server.arg("sleep_t"));
-//     cm.device_config_update(sampling_range,server.arg("sampling_range"));
-//     cm.device_config_update(number_of_samples_for_fabric,server.arg("number_of_samples_for_fabric"));
-//     cm.device_config_update(tolerance,server.arg("tolerance"));
-//     cm.device_config_update(encoder_rev_pulse,server.arg("encoder_rev_pulse"));
-//     cm.device_config_update(circle_dim,server.arg("circle_dim"));
-//     cm.device_config_update(step_rev_pulse,server.arg("step_rev_pulse"));
-//     cm.write(DEVICE_CONFIG,device_config_size,(byte*)cm.device_config,DATA_TYPE_16);
-//     while(!cm.save());
-//   }
-//   String content=device_set_html;
-//   content.replace("@distance_val1",cm.DCToStr(distance_val1));
-//   content.replace("@sleep_t",cm.DCToStr(sleep_t));  
-//   content.replace("@sampling_range",cm.DCToStr(sampling_range)); 
-//   content.replace("@number_of_samples_for_fabric",cm.DCToStr(number_of_samples_for_fabric));     
-//   content.replace("@tolerance",cm.DCToStr(tolerance)); 
-//   content.replace("@encoder_rev_pulse",cm.DCToStr(encoder_rev_pulse)); 
-//   content.replace("@circle_dim",cm.DCToStr(circle_dim)); 
-//   content.replace("@step_rev_pulse",cm.DCToStr(step_rev_pulse)); 
-//   server.send(200, "text/html", content);
-// }
-
-// void handleNotFound() {
-//   String message = "File Not Found\n\n";
-//   message += "URI: ";
-//   message += server.uri();
-//   message += "\nMethod: ";
-//   message += (server.method() == HTTP_GET) ? "GET" : "POST";
-//   message += "\nArguments: ";
-//   message += server.args();
-//   message += "\n";
-//   for (uint8_t i = 0; i < server.args(); i++) {
-//     message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
-//   }
-//   server.send(404, "text/plain", message);
-// }

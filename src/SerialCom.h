@@ -107,9 +107,9 @@
   };///DEVICE_CONFIG
   
   enum{ 
-  end_of_work,
-  cwidth_val,    
+  end_of_work,     
   mwidth_val,
+  cwidth_val, 
   number_of_samples,
   fabric_ref,
   measured, 
