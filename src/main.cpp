@@ -74,7 +74,7 @@ void setup(){
     WiFi.setAutoReconnect(true);  
     // Wait for connection
     uint8_t i = 0;
-    while (WiFi.status() != WL_CONNECTED && i++ < 6)
+    while (WiFi.status() != WL_CONNECTED && i++ < 20)
     { //wait 10 seconds
       delay(500);
     }
@@ -83,7 +83,7 @@ void setup(){
         #ifdef DEBUG_MODE
         Serial.print("Could not connect to");  
         #endif    
-        ESP.restart();
+        
       }
       else
       {
@@ -91,7 +91,8 @@ void setup(){
         Serial.print("Connected! IP address: ");
         Serial.println(WiFi.localIP());
        #endif
-      
+      cm.device_register[wifi_ok][0]=1;
+      cm.st_update(wifi_ok);
       }
  
   //aktif edilecek 
@@ -106,8 +107,7 @@ void setup(){
 
     // cm.device_register[ap_sta_mod][0]=1;
     // cm.st_update(ap_sta_mod);
-   cm.device_register[wifi_ok][0]=1;
-    cm.st_update(wifi_ok);
+   
   //aktif edilecek
 
 
