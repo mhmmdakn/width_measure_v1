@@ -105,6 +105,7 @@ void setup(){
      server.begin(); 
 
 
+
     // cm.device_register[ap_sta_mod][0]=1;
     // cm.st_update(ap_sta_mod);
    
