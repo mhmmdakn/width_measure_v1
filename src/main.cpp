@@ -303,6 +303,7 @@ void handleData(AsyncWebServerRequest *request){
   //****st_update in success ini seçenekli yapıp dene
   //  while(!cm.device_register_check())
   //  delay(100);
+    myObject["RSII"]=WiFi.RSSI();
     myObject["plc_sta"]=plc_status;
     myObject["cwidth_val"]=word(cm.device_register[cwidth_val][1],cm.device_register[cwidth_val][0]);
     myObject["mwidth_val"]=word(cm.device_register[mwidth_val][1],cm.device_register[mwidth_val][0]);
