@@ -221,22 +221,17 @@ bool loadFromSdCard(AsyncWebServerRequest *request, String path)
     path += "dashboard.html";
   String dataType = dataTypeGet(path);
 
-  // String pathWithGz = path + ".gz";
-  // if ((SPIFFS.exists(pathWithGz) || SPIFFS.exists(path)))
-  // {
-  //   if (SPIFFS.exists(pathWithGz))
-  //   {
-  //     path = pathWithGz;
-  //     dataType = "application/x-gzip";
-  //   }
-  // }
-
   if (!SPIFFS.exists(path.c_str()))
     return false;
-   if (dataType == "text/html")
-     response = request->beginResponse(SPIFFS, path, dataType, false, processorRead);
-  else
-  response = request->beginResponse(SPIFFS, path, dataType, false);
+  if (dataType == "text/html")
+     response = request->beginResponse(SPIFFS, path, dataType, false, processorRead); 
+  else{
+    response = request->beginResponse(SPIFFS, path, dataType, false); 
+    if(dataType=="text/css"||dataType=="image/png"){    
+      response->addHeader("Cache-Control","max-age=2592000"); 
+    }
+  } 
+
   request->send(response);
 
   return true;

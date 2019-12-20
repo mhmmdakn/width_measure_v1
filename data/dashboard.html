@@ -24,6 +24,20 @@ function loadXMLDoc() {
         document.getElementById('plc_sta').style.color="red"
       }
 
+      if(myObj.RSII<-90)
+          document.getElementById("RSII").src="wifi-0.png";
+      else if(myObj.RSII<-80)
+          document.getElementById("RSII").src="wifi-25.png";
+      else if(myObj.RSII<-70)
+          document.getElementById("RSII").src="wifi-50.png";
+      else if(myObj.RSII<-67)
+          document.getElementById("RSII").src="wifi-75.png";
+      else if(myObj.RSII<-30)
+          document.getElementById("RSII").src="wifi-100.png";
+      else if(myObj.RSII==0)
+          document.getElementById("RSII").src="wifi-0.png";
+    
+
     }
   };
   xhttp.open('GET', '/data', true);
@@ -39,6 +53,7 @@ setInterval(()=>{if (!document.hidden)loadXMLDoc();},1000);
  <div class='model' ><b >VHBM-181128-V2</b></div>
  </div>
  <div id="plc_sta" style='float: right;position: relative;top: 20px;right: 20px; color: red;'>PLC Offline</div>
+ <img id="RSII" style="float: right;right: 30px;position: relative;top: 10px;width: 50px;" src="wifi-0.png">
   <a class='active' href='/'>Dashboard</a>
   <a href='/wifi_settings.html'>Wifi Settings</a>
   <a href='/device_settings.html'>Device Settings</a>
